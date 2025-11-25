@@ -1,59 +1,143 @@
 # Apache Jira Scraper & Transformer Pipeline
 
 ## Overview
-This project builds a fault-tolerant pipeline to scrape issue data from three Apache Jira projects and transform it into a structured, LLM-ready JSONL dataset.
-Designed for performance, reliability, and easy recovery, the code meets SDE intern assignment standards at Scaler.
 
-## Project Structure
+This project builds a reliable, fault-tolerant, and scalable data pipeline that scrapes issue data from Apache Jira projects and transforms it into a structured JSONL dataset suitable for training Large Language Models (LLMs). It is designed to demonstrate robust data engineering practices, including error handling, modularity, and clean data output.
+
+## Features
+
+* ✅ Scrapes issues, metadata, comments from three Apache Jira projects: **HADOOP**, **SPARK**, **KAFKA**
+* ✅ Graceful handling of pagination, rate limits, empty/malformed responses
+* ✅ Transforms raw issues into LLM-friendly JSONL with summaries, category classification, and Q&A pairs
+* ✅ Includes recovery, fault-tolerance, and modular design
+* ✅ Output ready for downstream NLP training or analysis
+
+## Directory Structure
+
 ```
-jira_scraper/
-  ├─ data/
-  │   ├─ raw/         # Raw API JSON files
-  │   ├─ processed/   # Final JSONL corpus
-  ├─ scraper/         # Scraping logic
-  ├─ transformer/     # Data transformation logic
-  ├─ main.py          # Entry point for scraping
-  ├─ requirements.txt # Python dependencies
+jira-scraper-assignment/
+├── analysis/
+│   └── llm_enhance.py         # Adds summary, category, Q&A via OpenAI API
+├── output/
+│   ├── clean_issues.jsonl     # Cleaned raw issues
+│   ├── final_dataset.jsonl    # LLM-enhanced output
+│   ├── HADOOP_raw.jsonl       # Raw data per project
+│   ├── KAFKA_raw.jsonl
+│   └── SPARK_raw.jsonl
+├── state/                    # Checkpointing for resume logic (if implemented)
+├── clean.py                  # Cleans raw to structured
+├── config.json               # Config for scraper
+├── scraper.py                # Fetches issues using Jira API
+├── transform.py              # Extracts essential fields
+├── requirements.txt
+├── README.md                 # This file
+└── set_api_key.ps1           # Helper script for setting OpenAI key (Windows)
 ```
 
-## Setup and Usage
+## Setup Instructions
 
-### 1. Install requirements
+1. **Clone this repository**:
+
+```bash
+git clone https://github.com/your-username/jira-scraper-assignment.git
+cd jira-scraper-assignment
+```
+
+2. **Create & activate virtual environment (optional but recommended)**:
+
+```bash
+python -m venv venv
+source venv/bin/activate        # Mac/Linux
+.\venv\Scripts\activate         # Windows
+```
+
+3. **Install dependencies**:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Scrape Jira Issues
-Edit project keys in main.py if needed, then run:
+4. **Set OpenAI API Key** (for LLM-enhancement step):
+
+```powershell
+# For current session (PowerShell)
+$env:OPENAI_API_KEY = "your_real_key_here"
+
+# Or run helper script
+.\set_api_key.ps1 "your_real_key_here"
+```
+
+## Usage
+
+### 1. Scrape Apache Jira Issues
 
 ```bash
-python main.py
+python scraper.py
 ```
-Results saved in `data/raw/{project}_issues.json`
 
-### 3. Transform to LLM-ready JSONL
+Output: `output/{PROJECT}_raw.jsonl` files
+
+### 2. Clean and Normalize Raw Data
+
 ```bash
-python transformer/transform_to_jsonl.py
+python clean.py
 ```
-Outputs in `data/processed/{project}_issues.jsonl`
 
-## System Design & Architecture
-- Modular folders: separation of scraping vs transformation logic.
-- Uses Jira REST API: Clean parameterization, pagination supported (startAt, maxResults).
-- Reliability: Script resumes safely if interrupted, folders auto-created.
-- Data schema: All essential fields (summary, status, comments, labels, dates, derived summary & QnA).
-- Edge case handling: Missing fields handled, retries can be added for request failures.
+Output: `output/clean_issues.jsonl`
 
-## Edge Cases & Optimization
-- Folder existence: Code auto-creates folders if missing.
-- Request failures: Errors are printed, and code stops gracefully.
-- Rate limits: For full-scale use, add sleep/backoff on HTTP 429 responses, or round-robin requests.
-- Scalability: Can increase pagination batch size or parallelize requests for larger projects.
-- Recovery: Checkpoint logic can be added to resume exact page.
+### 3. Transform with OpenAI (adds summaries, Q&A)
 
-## Future Improvements
-- Add automatic checkpointing & resume (track last fetched issue ID).
-- Add robust retry/backoff for network failures and 429 rate limits.
-- Use async requests for speed on very large projects.
-- Enhanced QnA/task generation using actual LLMs, if allowed.
-- More detailed logs and CLI options.
+```bash
+python analysis/llm_enhance.py
+```
+
+Output: `output/final_dataset.jsonl`
+
+## Sample Input/Output
+
+**Input Snippet (clean_issues.jsonl)**:
+
+```json
+{
+  "project": "SPARK",
+  "issue_key": "SPARK-492",
+  "title": "Add unit tests for shuffle operations",
+  "description": "Need to add these in the shuffle branch.",
+  "comments": ["Github comment from mateiz: Unit tests for shuffle operations."]
+}
+```
+
+**Transformed Output (final_dataset.jsonl)**:
+
+```json
+{
+  "summary": "Added unit tests to validate shuffle logic...",
+  "category": "Improvement",
+  "qna": [
+    {"question": "Why were shuffle operation tests added?", "answer": "To ensure correctness..."},
+    ...
+  ]
+}
+```
+
+## Edge Cases Handled
+
+* Missing fields or comments → handled with defaults
+* HTTP 429 or API errors → printed/logged, script fails gracefully
+* Duplicate entries avoided during LLM enhancement (resumable logic)
+* Folder auto-creation for outputs
+
+## Future Enhancements
+
+* Async scraping for speed
+* Retry logic/backoff on API failures
+* Configurable pagination batch sizes
+* Logging and CLI for project-level control
+* Add test cases and CI hooks
+
+## Authors
+
+* Assignment completed by: **VIJAYAGEETHA V**
+* For: **Scaler SDE Internship (2026 Batch)**
+
+
