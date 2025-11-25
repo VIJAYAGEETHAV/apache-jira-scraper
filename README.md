@@ -12,29 +12,26 @@ This project builds a reliable, fault-tolerant, and scalable data pipeline that 
 * ✅ Includes recovery, fault-tolerance, and modular design
 * ✅ Output ready for downstream NLP training or analysis
 
-## Directory Structure
+🧱 Project Structure
 
-```
-jira-scraper-assignment/
-├── analysis/
-│   └── llm_enhance.py         # Adds summary, category, Q&A via OpenAI API
-├── output/
-│   ├── clean_issues.jsonl     # Cleaned raw issues
-│   ├── final_dataset.jsonl    # LLM-enhanced output
-│   ├── HADOOP_raw.jsonl       # Raw data per project
-│   ├── KAFKA_raw.jsonl
-│   └── SPARK_raw.jsonl
-├── state/                    # Checkpointing for resume logic (if implemented)
-├── clean.py                  # Cleans raw to structured
-├── config.json               # Config for scraper
-├── scraper.py                # Fetches issues using Jira API
-├── transform.py              # Extracts essential fields
-├── requirements.txt
-├── README.md                 # This file
-└── set_api_key.ps1           # Helper script for setting OpenAI key (Windows)
-```
+JIRA_SCRAPER/
+├── data/
+│ ├── raw/ # Raw API responses (per project)
+│ │ ├── hadoop_issues.json
+│ │ ├── kafka_issues.json
+│ │ └── spark_issues.json
+│ └── processed/ # Cleaned, LLM-ready JSONL files
+│ ├── hadoop_issues.jsonl
+│ ├── kafka_issues.jsonl
+│ └── spark_issues.jsonl
+├── transformer/
+│ └── transform_to_jsonl.py # Converts raw data to JSONL corpus
+├── main.py # Jira scraping logic
+├── requirements.txt # Dependencies
+├── README.md # Project documentation
 
-## Setup Instructions
+
+## ⚙️ Setup Instructions
 
 1. **Clone this repository**:
 
@@ -57,15 +54,7 @@ source venv/bin/activate        # Mac/Linux
 pip install -r requirements.txt
 ```
 
-4. **Set OpenAI API Key** (for LLM-enhancement step):
 
-```powershell
-# For current session (PowerShell)
-$env:OPENAI_API_KEY = "your_real_key_here"
-
-# Or run helper script
-.\set_api_key.ps1 "your_real_key_here"
-```
 
 ## Usage
 
@@ -93,7 +82,7 @@ python analysis/llm_enhance.py
 
 Output: `output/final_dataset.jsonl`
 
-## Sample Input/Output
+## 🔍Sample Input/Output
 
 **Input Snippet (clean_issues.jsonl)**:
 
@@ -120,14 +109,14 @@ Output: `output/final_dataset.jsonl`
 }
 ```
 
-## Edge Cases Handled
+## 🛠 Edge Cases Handled
 
 * Missing fields or comments → handled with defaults
 * HTTP 429 or API errors → printed/logged, script fails gracefully
 * Duplicate entries avoided during LLM enhancement (resumable logic)
 * Folder auto-creation for outputs
 
-## Future Enhancements
+## 📈 Future Enhancements
 
 * Async scraping for speed
 * Retry logic/backoff on API failures
@@ -135,9 +124,9 @@ Output: `output/final_dataset.jsonl`
 * Logging and CLI for project-level control
 * Add test cases and CI hooks
 
-## Authors
+## 👨‍💻 Author & Assignment
 
-* Assignment completed by: **VIJAYAGEETHA V**
-* For: **Scaler SDE Internship (2026 Batch)**
+This project was completed as part of the Scaler Web Scraping Tutor Assignment to demonstrate data engineering, scraping, and transformation skills under time constraints.
 
+Feedback welcomed at submission!
 
