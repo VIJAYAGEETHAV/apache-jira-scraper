@@ -13,22 +13,21 @@ This project builds a reliable, fault-tolerant, and scalable data pipeline that 
 * ✅ Output ready for downstream NLP training or analysis
 
 🧱 Project Structure
-
-JIRA_SCRAPER/
-├── data/
-│ ├── raw/ # Raw API responses (per project)
-│ │ ├── hadoop_issues.json
-│ │ ├── kafka_issues.json
-│ │ └── spark_issues.json
-│ └── processed/ # Cleaned, LLM-ready JSONL files
-│ ├── hadoop_issues.jsonl
-│ ├── kafka_issues.jsonl
-│ └── spark_issues.jsonl
-├── transformer/
-│ └── transform_to_jsonl.py # Converts raw data to JSONL corpus
-├── main.py # Jira scraping logic
-├── requirements.txt # Dependencies
-├── README.md # Project documentation
+📁 JIRA_SCRAPER/
+├── 📁 data/
+│   ├── 📁 raw/              # Raw API responses per project
+│   │   ├── hadoop_issues.json
+│   │   ├── kafka_issues.json
+│   │   └── spark_issues.json
+│   └── 📁 processed/        # Cleaned, LLM-ready JSONL files
+│       ├── hadoop_issues.jsonl
+│       ├── kafka_issues.jsonl
+│       └── spark_issues.jsonl
+├── 📁 transformer/
+│   └── transform_to_jsonl.py  # Converts raw data to JSONL corpus
+├── main.py                    # Jira scraping logic
+├── requirements.txt           # Dependencies
+└── README.md                  # Project documentation
 
 
 ## ⚙️ Setup Instructions
